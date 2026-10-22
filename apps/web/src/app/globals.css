@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+/* Cores da marca do personal — sobrescritas por tenant no layout /t/[tenant] */
+:root {
+  --brand-primary: #111827;
+  --brand-accent: #22c55e;
+}
+
+@theme inline {
+  --color-brand: var(--brand-primary);
+  --color-brand-accent: var(--brand-accent);
+}
