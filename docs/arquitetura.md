@@ -13,7 +13,7 @@ Monólito modular em Next.js na Vercel. Um único app atende três perfis:
 ## Multi-tenant
 
 - Tenant resolvido pelo subdomínio (`felipe.dominio.com.br`) no `middleware.ts`.
-- Toda tabela de negócio tem `tenantId`; o acesso ao banco usa um cliente Prisma com filtro de tenant obrigatório.
+- Toda tabela de negócio tem `tenantId`; toda server action obtém o personal logado (`requireOwner`) e filtra por `tenantId`.
 - Tema (cores, logo, nome) e manifesto do PWA gerados por tenant.
 - Domínio próprio do personal entra depois, via CNAME + tabela `TenantDomain`.
 
@@ -49,3 +49,10 @@ Monólito modular em Next.js na Vercel. Um único app atende três perfis:
 - Apps nativos: Capacitor empacotando o PWA; uma build por personal (white label na loja).
 - Extração de serviços (billing, notificações) quando o volume justificar.
 - IA para montagem de treinos e atendimento ao aluno.
+
+## Atualização 21/10/2026
+
+- ORM: Drizzle no lugar do Prisma (ver ADR 0003). Migrações SQL em `apps/web/db/migrations`.
+- Banco local: Postgres embutido (PGlite) com dados de demonstração; produção: Supabase.
+- Autenticação: senha (bcrypt) + cookie de sessão JWT; aluno ativa a conta por link de convite.
+- Rotas: painel em `/painel`, app do aluno em `/t/<slug>` (ou subdomínio), convite em `/convite/<token>`.

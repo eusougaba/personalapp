@@ -4,6 +4,7 @@ on:
   pull_request:
   push:
     branches: [main]
+    paths-ignore: ["site/**", "docs/**"]
 
 jobs:
   web:
@@ -16,10 +17,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: npm install
-      - run: npx prisma validate
-        env:
-          DATABASE_URL: postgresql://ci:ci@localhost:5432/ci
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      - run: npm ci
       - run: npm run typecheck
       - run: npm run build
         env:

@@ -10,23 +10,8 @@ export function tenantSlugFromHost(host: string | null): string | null {
   if (clean === ROOT_DOMAIN) return null;
   if (clean.endsWith(`.${ROOT_DOMAIN}`)) {
     const sub = clean.slice(0, -(ROOT_DOMAIN.length + 1));
-    return RESERVED.has(sub) ? null : sub;
+    return RESERVED.has(sub) || sub.includes(".") ? null : sub;
   }
   // Domínio próprio (futuro): resolvido via tabela TenantDomain
   return null;
-}
-
-export interface TenantTheme {
-  name: string;
-  logoUrl?: string | null;
-  primaryColor: string;
-  accentColor: string;
-}
-
-// Converte a marca do personal em variáveis CSS aplicadas no <html>
-export function themeToCssVars(t: TenantTheme): Record<string, string> {
-  return {
-    "--brand-primary": t.primaryColor,
-    "--brand-accent": t.accentColor,
-  };
 }

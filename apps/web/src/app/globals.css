@@ -1,12 +1,16 @@
 @import "tailwindcss";
 
-/* Cores da marca do personal — sobrescritas por tenant no layout /t/[tenant] */
 :root {
-  --brand-primary: #111827;
-  --brand-accent: #22c55e;
+  --accent: #059669;
+  --brand: #111827;
 }
 
-@theme inline {
-  --color-brand: var(--brand-primary);
-  --color-brand-accent: var(--brand-accent);
+body {
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+input[type="date"],
+input[type="time"] {
+  min-height: 42px;
 }
