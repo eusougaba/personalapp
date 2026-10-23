@@ -441,6 +441,15 @@ export async function addWorkoutItem(form: FormData) {
   revalidatePath(`/painel/treinos/${workout.id}`);
 }
 
+export async function updateWorkoutItem(form: FormData) {
+  const { db, workout } = await ownWorkout(String(form.get("workoutId")));
+  await db
+    .update(S.workoutItems)
+    .set({ sets: int(form, "sets"), reps: str(form, "reps"), load: str(form, "load"), restSeconds: int(form, "restSeconds"), notes: str(form, "notes") })
+    .where(and(eq(S.workoutItems.id, String(form.get("id"))), eq(S.workoutItems.workoutId, workout.id)));
+  revalidatePath(`/painel/treinos/${workout.id}`);
+}
+
 export async function removeWorkoutItem(form: FormData) {
   const { db, workout } = await ownWorkout(String(form.get("workoutId")));
   await db.delete(S.workoutItems).where(and(eq(S.workoutItems.id, String(form.get("id"))), eq(S.workoutItems.workoutId, workout.id)));
@@ -488,7 +497,11 @@ export async function createExercise(form: FormData) {
       tenantId: tenant.id,
       name,
       muscleGroup: str(form, "muscleGroup"),
-      videoUrl: str(form, "videoUrl"),
+      equipment: str(form, "equipment"),
+      images: (() => {
+        const u = str(form, "imageUrl");
+        return u && /^https:\/\//.test(u) ? [u] : null;
+      })(),
       instructions: str(form, "instructions"),
     });
   }
@@ -559,4 +572,13 @@ export async function saveBrand(form: FormData) {
     })
     .where(eq(S.tenants.id, tenant.id));
   redirect("/painel/configuracoes?salvo=1");
+}
+
+// ───────────── Anamnese ─────────────
+
+export async function resetAnamnesis(form: FormData) {
+  const { db, tenant } = await requireOwner();
+  const sid = String(form.get("studentId"));
+  await db.delete(S.anamneses).where(and(eq(S.anamneses.studentId, sid), eq(S.anamneses.tenantId, tenant.id)));
+  redirect(`/painel/alunos/${sid}?aba=anamnese`);
 }

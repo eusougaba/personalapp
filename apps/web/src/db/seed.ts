@@ -212,15 +212,47 @@ export async function seedDemo(db: DB) {
   ];
   for (const w of ws) {
     const wid = uid();
-    await db.insert(s.workouts).values({ id: wid, tenantId, studentId: studentIds[w.studentIdx]!, name: w.name });
+    const studentId = studentIds[w.studentIdx]!;
+    await db.insert(s.workouts).values({ id: wid, tenantId, studentId, name: w.name });
     await db.insert(s.workoutItems).values(
       w.items.map(([ex, sets, reps, load], order) => ({ id: uid(), workoutId: wid, exerciseId: ex, order, sets, reps, load: load || null, restSeconds: 60 })),
     );
-    await db.insert(s.workoutLogs).values([
-      { id: uid(), workoutId: wid, completedAt: fromLocal(addDays(today, -7), "07:00"), effort: 7 },
-      { id: uid(), workoutId: wid, completedAt: fromLocal(addDays(today, -3), "07:00"), effort: 8 },
-    ]);
+    // Histórico de 4 sessões com cargas subindo aos poucos
+    const offsets = [-24, -17, -10, -3];
+    for (const [k, off] of offsets.entries()) {
+      const logId = uid();
+      const at = fromLocal(addDays(today, off - (w.studentIdx % 2)), "07:00");
+      await db.insert(s.workoutLogs).values({ id: logId, workoutId: wid, completedAt: at, effort: 6 + (k % 3), durationSec: 3000 + k * 120 });
+      const sets: (typeof s.workoutSetLogs.$inferInsert)[] = [];
+      for (const [ex, n, reps, load] of w.items) {
+        const base = parseFloat(String(load).replace(",", "."));
+        if (!Number.isFinite(base)) continue;
+        const kg = Math.round(Math.max(base * 0.7, base - (offsets.length - 1 - k) * 2.5) * 2) / 2;
+        const r = parseInt(String(reps), 10) || 10;
+        for (let i = 1; i <= n; i++) {
+          sets.push({ id: uid(), tenantId, studentId, workoutLogId: logId, exerciseId: ex, setNumber: i, reps: r, loadKg: kg.toFixed(2), createdAt: at });
+        }
+      }
+      if (sets.length) await db.insert(s.workoutSetLogs).values(sets);
+    }
   }
+
+  // Anamnese da Ana (os outros alunos ainda não responderam)
+  await db.insert(s.anamneses).values({
+    id: uid(),
+    tenantId,
+    studentId: studentIds[0]!,
+    hasRisk: true,
+    answers: {
+      coracao: false, dor_peito: false, tontura: false,
+      osteo: true, osteo_detalhe: "Condromalácia no joelho direito, sem dor no dia a dia",
+      cronica: false, remedio: false, cirurgia: false, gestacao: false,
+      atividade: "1 a 2 vezes por semana", experiencia: "De 6 meses a 2 anos", sono: "7 a 8 horas", fuma: "Não", alcool: "Socialmente",
+      objetivos: ["Emagrecer", "Condicionamento físico"], dias: "3", horarios: ["Manhã cedo"],
+      observacoes: "Prefiro treinos dinâmicos, não gosto de esteira.",
+      emergencia_nome: "Pedro Souza", emergencia_tel: "(11) 98888-1111",
+    },
+  });
 
   // Avaliações mensais
   const evo: [number, number[], number[]][] = [

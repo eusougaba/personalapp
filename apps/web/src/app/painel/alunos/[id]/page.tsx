@@ -4,7 +4,9 @@ import { and, asc, desc, eq, gte, inArray } from "drizzle-orm";
 import { schema as S, type DB } from "@/db";
 import type { Student, Tenant } from "@/db/schema";
 import { requireOwner } from "@/lib/auth";
-import { activeSubscription, inviteUrl, studentAppUrl } from "@/lib/queries";
+import { activeSubscription, inviteUrl, loadProgress, studentAppUrl } from "@/lib/queries";
+import { ExerciseImage } from "@/components/exercise-image";
+import { ALL_QUESTIONS, ANAMNESE } from "@/lib/anamnese";
 import {
   assignPlan,
   cancelInvoice,
@@ -16,6 +18,7 @@ import {
   deleteStudent,
   markInvoicePaid,
   regenerateInvite,
+  resetAnamnesis,
   setStudentStatus,
   updateStudent,
 } from "@/app/actions/painel";
@@ -70,6 +73,7 @@ export default async function AlunoPage({
   const [student] = await db.select().from(S.students).where(and(eq(S.students.id, id), eq(S.students.tenantId, tenant.id)));
   if (!student) notFound();
   const ctx = { db, tenant, student };
+  const [anam] = await db.select({ hasRisk: S.anamneses.hasRisk }).from(S.anamneses).where(eq(S.anamneses.studentId, student.id));
   const st = STUDENT_STATUS[student.status]!;
   const base = `/painel/alunos/${id}`;
   const years = age(student.birthDate);
@@ -87,6 +91,7 @@ export default async function AlunoPage({
         subtitle={
           <span className="flex flex-wrap items-center gap-2">
             <Badge tone={st.tone}>{st.label}</Badge>
+            {!anam ? <Badge tone="yellow">Anamnese pendente</Badge> : anam.hasRisk ? <Badge tone="red">Atenção na saúde</Badge> : null}
             {student.goal && <span>{student.goal}</span>}
             {years != null && <span>· {years} anos</span>}
           </span>
@@ -110,6 +115,7 @@ export default async function AlunoPage({
           { key: "treinos", label: "Treinos", href: `${base}?aba=treinos` },
           { key: "avaliacoes", label: "Avaliações", href: `${base}?aba=avaliacoes` },
           { key: "presenca", label: "Presença", href: `${base}?aba=presenca` },
+          { key: "anamnese", label: "Anamnese", href: `${base}?aba=anamnese` },
           { key: "dados", label: "Dados", href: `${base}?aba=dados` },
         ]}
       />
@@ -119,6 +125,7 @@ export default async function AlunoPage({
       {aba === "treinos" && <Treinos {...ctx} />}
       {aba === "avaliacoes" && <Avaliacoes {...ctx} />}
       {aba === "presenca" && <Presenca {...ctx} />}
+      {aba === "anamnese" && <AnamneseTab {...ctx} />}
       {aba === "dados" && <Dados {...ctx} />}
     </>
   );
@@ -374,6 +381,7 @@ async function Financeiro({ db, tenant, student }: Ctx) {
 }
 
 async function Treinos({ db, student }: Ctx) {
+  const loads = (await loadProgress(db, student.id)).filter((l) => l.best > 0);
   const workouts = await db.select().from(S.workouts).where(eq(S.workouts.studentId, student.id)).orderBy(asc(S.workouts.name));
   const ids = workouts.map((w) => w.id);
   const [items, logs] = await Promise.all([
@@ -410,6 +418,41 @@ async function Treinos({ db, student }: Ctx) {
             );
           })}
         </div>
+      )}
+      {loads.length > 0 && (
+        <Card title="Evolução de carga por exercício">
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-zinc-50 text-left text-xs uppercase text-zinc-500">
+                <tr>
+                  <th className="px-4 py-2.5">Exercício</th>
+                  <th className="px-4 py-2.5">Primeira</th>
+                  <th className="px-4 py-2.5">Última</th>
+                  <th className="px-4 py-2.5">Recorde</th>
+                  <th className="px-4 py-2.5">Sessões</th>
+                  <th className="px-4 py-2.5">Tendência</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-100">
+                {loads.map((l) => (
+                  <tr key={l.id}>
+                    <td className="px-4 py-2.5">
+                      <div className="flex items-center gap-2.5">
+                        <ExerciseImage images={l.images} name={l.name} size="sm" className="h-10 w-10" />
+                        <span className="font-medium">{l.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2.5 tabular-nums">{l.first.maxKg.toLocaleString("pt-BR")} kg</td>
+                    <td className="px-4 py-2.5 tabular-nums">{l.last.maxKg.toLocaleString("pt-BR")} kg{l.last.reps ? ` × ${l.last.reps}` : ""}</td>
+                    <td className="px-4 py-2.5 tabular-nums font-semibold">{l.best.toLocaleString("pt-BR")} kg</td>
+                    <td className="px-4 py-2.5 tabular-nums">{l.sessions.length}</td>
+                    <td className="w-32 px-4 py-2.5">{l.sessions.length > 1 ? <Sparkline values={l.sessions.map((x) => x.maxKg)} height={28} /> : "—"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </Card>
       )}
       {logs.length > 0 && (
         <Card title="Treinos concluídos pelo aluno">
@@ -589,6 +632,61 @@ function Dados({ student }: Ctx) {
           </form>
         </Card>
       </div>
+    </div>
+  );
+}
+
+async function AnamneseTab({ db, student }: Ctx) {
+  const [a] = await db.select().from(S.anamneses).where(eq(S.anamneses.studentId, student.id));
+  if (!a) {
+    return (
+      <Card>
+        <EmptyState
+          icon="receipt"
+          title="Anamnese ainda não respondida"
+          text={student.userId ? "O aluno verá o questionário na próxima vez que abrir o app." : "O aluno responde no primeiro acesso, logo depois de ativar o convite."}
+        />
+      </Card>
+    );
+  }
+  const show = (v: unknown) => (Array.isArray(v) ? v.join(", ") : v === true ? "Sim" : v === false ? "Não" : v ? String(v) : "—");
+  const flagged = ALL_QUESTIONS.filter((q) => q.type === "yesno" && a.answers[q.id] === true);
+  return (
+    <div className="space-y-6">
+      {a.hasRisk ? (
+        <Notice tone="red">
+          <strong>Atenção:</strong> o aluno respondeu “sim” em {flagged.length} pergunta(s) de saúde. Avalie a necessidade de liberação médica antes de treinos intensos.
+        </Notice>
+      ) : (
+        <Notice tone="green">Nenhum ponto de atenção na triagem de saúde.</Notice>
+      )}
+      <div className="grid gap-6 lg:grid-cols-2">
+        {ANAMNESE.map((sec) => (
+          <Card key={sec.title} title={sec.title}>
+            <dl className="divide-y divide-zinc-100">
+              {sec.questions.map((q) => {
+                const v = a.answers[q.id];
+                const det = a.answers[`${q.id}_detalhe`];
+                const alert = q.type === "yesno" && v === true;
+                return (
+                  <div key={q.id} className="px-5 py-3">
+                    <dt className="text-xs text-zinc-500">{q.label}</dt>
+                    <dd className={`mt-0.5 text-sm font-medium ${alert ? "text-red-600" : "text-zinc-900"}`}>
+                      {show(v)}
+                      {det ? <span className="block font-normal text-zinc-600">{String(det)}</span> : null}
+                    </dd>
+                  </div>
+                );
+              })}
+            </dl>
+          </Card>
+        ))}
+      </div>
+      <form action={resetAnamnesis} className="flex flex-wrap items-center gap-3">
+        <input type="hidden" name="studentId" value={student.id} />
+        <span className="text-sm text-zinc-500">Respondida em {fmtDate(a.completedAt)}.</span>
+        <DangerConfirm label="Pedir para responder de novo" confirmLabel="Confirmar: aluno responde de novo" />
+      </form>
     </div>
   );
 }

@@ -1,15 +1,26 @@
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { and, asc, eq, isNull, ne, or } from "drizzle-orm";
 import { schema as S } from "@/db";
 import { requireOwner } from "@/lib/auth";
-import { addWorkoutItem, deleteWorkout, duplicateWorkout, moveWorkoutItem, removeWorkoutItem, updateWorkout } from "@/app/actions/painel";
+import { MUSCLE_GROUPS } from "@/lib/exercises";
+import { addWorkoutItem, deleteWorkout, duplicateWorkout, moveWorkoutItem, removeWorkoutItem, updateWorkout, updateWorkoutItem } from "@/app/actions/painel";
 import { DangerConfirm, SubmitButton } from "@/components/client";
-import { Card, EmptyState, Field, Input, Notice, PageHeader, Select, Textarea } from "@/components/ui";
+import { ExerciseImage } from "@/components/exercise-image";
+import { Card, EmptyState, Field, Input, Notice, PageHeader, Select, Textarea, cx } from "@/components/ui";
 import { Icon } from "@/components/icons";
 
-export default async function TreinoEditor({ params, searchParams }: { params: Promise<{ id: string }>; searchParams: Promise<{ copiado?: string }> }) {
+const small = "w-full rounded-lg border border-zinc-200 bg-white px-2 py-1.5 text-sm";
+
+export default async function TreinoEditor({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ copiado?: string; grupo?: string; q?: string }>;
+}) {
   const { id } = await params;
-  const { copiado } = await searchParams;
+  const { copiado, grupo = "Peito", q = "" } = await searchParams;
   const { db, tenant } = await requireOwner();
   const [w] = await db
     .select({ workout: S.workouts, student: S.students })
@@ -28,53 +39,65 @@ export default async function TreinoEditor({ params, searchParams }: { params: P
       .select()
       .from(S.exercises)
       .where(or(isNull(S.exercises.tenantId), eq(S.exercises.tenantId, tenant.id)))
-      .orderBy(asc(S.exercises.muscleGroup), asc(S.exercises.name)),
+      .orderBy(asc(S.exercises.name)),
     db
       .select({ id: S.students.id, name: S.students.name })
       .from(S.students)
       .where(and(eq(S.students.tenantId, tenant.id), ne(S.students.id, w.student.id)))
       .orderBy(asc(S.students.name)),
   ]);
-  const groups = [...new Set(library.map((e) => e.muscleGroup ?? "Outros"))];
+  const norm = (s: string) => s.normalize("NFD").replace(/\p{Diacritic}/gu, "").toLowerCase();
+  const picker = q ? library.filter((e) => norm(e.name).includes(norm(q))) : library.filter((e) => (e.muscleGroup ?? "Outros") === grupo);
+  const groups = MUSCLE_GROUPS.filter((g) => library.some((e) => e.muscleGroup === g));
+  const base = `/painel/treinos/${id}`;
 
   return (
     <>
-      <PageHeader back={`/painel/alunos/${w.student.id}?aba=treinos`} title={w.workout.name} subtitle={`Treino de ${w.student.name}`} />
+      <PageHeader back={`/painel/alunos/${w.student.id}?aba=treinos`} title={w.workout.name} subtitle={`Treino de ${w.student.name} · ${items.length} exercício(s)`} />
       {copiado && <div className="mb-4"><Notice tone="green">Treino copiado para este aluno. Ajuste cargas e repetições se precisar.</Notice></div>}
-      <div className="grid gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <Card title={`Exercícios · ${items.length}`}>
+      <div className="grid gap-6 lg:grid-cols-5">
+        <div className="space-y-6 lg:col-span-3">
+          <Card title="Exercícios do treino">
             {items.length === 0 ? (
-              <EmptyState icon="dumbbell" title="Treino vazio" text="Adicione exercícios no formulário ao lado." />
+              <EmptyState icon="dumbbell" title="Treino vazio" text="Escolha os exercícios na biblioteca ao lado." />
             ) : (
               <ol className="divide-y divide-zinc-100">
                 {items.map(({ item, ex }, idx) => (
-                  <li key={item.id} className="flex items-center gap-3 px-5 py-3.5">
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-zinc-100 text-sm font-semibold text-zinc-700">{idx + 1}</span>
-                    <div className="min-w-0 flex-1">
-                      <p className="font-medium text-zinc-900">{ex.name}</p>
-                      <p className="text-sm text-zinc-500">
-                        {[item.sets && `${item.sets} séries`, item.reps && `${item.reps} reps`, item.load, item.restSeconds && `descanso ${item.restSeconds}s`].filter(Boolean).join(" · ")}
-                      </p>
-                      {item.notes && <p className="text-xs text-zinc-500">{item.notes}</p>}
+                  <li key={item.id} className="flex gap-3 px-4 py-3.5 sm:px-5">
+                    <div className="relative">
+                      <ExerciseImage images={ex.images} name={ex.name} size="sm" />
+                      <span className="absolute -left-1.5 -top-1.5 grid h-5 w-5 place-items-center rounded-full bg-zinc-900 text-[11px] font-semibold text-white">{idx + 1}</span>
                     </div>
-                    <div className="flex items-center">
-                      {(["up", "down"] as const).map((dir) => (
-                        <form key={dir} action={moveWorkoutItem}>
-                          <input type="hidden" name="workoutId" value={id} />
-                          <input type="hidden" name="id" value={item.id} />
-                          <input type="hidden" name="dir" value={dir} />
-                          <button className="rounded p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-30" disabled={(dir === "up" && idx === 0) || (dir === "down" && idx === items.length - 1)} aria-label={dir === "up" ? "Subir" : "Descer"}>
-                            <Icon name="chevronRight" size={16} className={dir === "up" ? "-rotate-90" : "rotate-90"} />
-                          </button>
-                        </form>
-                      ))}
-                      <form action={removeWorkoutItem}>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <p className="font-medium text-zinc-900">{ex.name}</p>
+                        <div className="flex shrink-0 items-center">
+                          {(["up", "down"] as const).map((dir) => (
+                            <form key={dir} action={moveWorkoutItem}>
+                              <input type="hidden" name="workoutId" value={id} />
+                              <input type="hidden" name="id" value={item.id} />
+                              <input type="hidden" name="dir" value={dir} />
+                              <button className="rounded p-1 text-zinc-400 hover:bg-zinc-100 hover:text-zinc-800 disabled:opacity-30" disabled={(dir === "up" && idx === 0) || (dir === "down" && idx === items.length - 1)} aria-label={dir === "up" ? "Subir" : "Descer"}>
+                                <Icon name="chevronRight" size={16} className={dir === "up" ? "-rotate-90" : "rotate-90"} />
+                              </button>
+                            </form>
+                          ))}
+                          <form action={removeWorkoutItem}>
+                            <input type="hidden" name="workoutId" value={id} />
+                            <input type="hidden" name="id" value={item.id} />
+                            <button className="rounded p-1 text-zinc-400 hover:bg-red-50 hover:text-red-600" aria-label="Remover"><Icon name="x" size={16} /></button>
+                          </form>
+                        </div>
+                      </div>
+                      <form action={updateWorkoutItem} className="mt-2 grid grid-cols-4 gap-1.5 text-xs text-zinc-500">
                         <input type="hidden" name="workoutId" value={id} />
                         <input type="hidden" name="id" value={item.id} />
-                        <button className="rounded p-1.5 text-zinc-400 hover:bg-red-50 hover:text-red-600" aria-label="Remover">
-                          <Icon name="x" size={16} />
-                        </button>
+                        <label>Séries<input name="sets" type="number" min={1} defaultValue={item.sets ?? ""} className={small} /></label>
+                        <label>Reps<input name="reps" defaultValue={item.reps ?? ""} className={small} /></label>
+                        <label>Carga<input name="load" defaultValue={item.load ?? ""} placeholder="kg" className={small} /></label>
+                        <label>Descanso (s)<input name="restSeconds" type="number" min={0} defaultValue={item.restSeconds ?? ""} className={small} /></label>
+                        <input name="notes" defaultValue={item.notes ?? ""} placeholder="Observação (ex.: cadência 3-1-1)" className={cx(small, "col-span-3")} />
+                        <SubmitButton variant="secondary" size="sm" pendingText="…">Salvar</SubmitButton>
                       </form>
                     </div>
                   </li>
@@ -90,45 +113,61 @@ export default async function TreinoEditor({ params, searchParams }: { params: P
               <div><SubmitButton variant="secondary">Salvar</SubmitButton></div>
             </form>
           </Card>
+          <div className="grid gap-6 sm:grid-cols-2">
+            <Card title="Copiar para outro aluno">
+              <form action={duplicateWorkout} className="grid gap-3 p-5">
+                <input type="hidden" name="id" value={id} />
+                <Select name="studentId" required>{others.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}</Select>
+                <SubmitButton variant="secondary" icon="copy" pendingText="Copiando…">Copiar treino</SubmitButton>
+              </form>
+            </Card>
+            <Card title="Excluir treino">
+              <form action={deleteWorkout} className="p-5">
+                <input type="hidden" name="id" value={id} />
+                <DangerConfirm label="Excluir treino" />
+              </form>
+            </Card>
+          </div>
         </div>
-        <div className="space-y-6">
-          <Card title="Adicionar exercício">
-            <form action={addWorkoutItem} className="grid grid-cols-2 gap-3 p-5">
-              <input type="hidden" name="workoutId" value={id} />
-              <Field label="Exercício" className="col-span-2">
-                <Select name="exerciseId" required>
-                  {groups.map((g) => (
-                    <optgroup key={g} label={g}>
-                      {library.filter((e) => (e.muscleGroup ?? "Outros") === g).map((e) => (
-                        <option key={e.id} value={e.id}>{e.name}{e.tenantId ? " ★" : ""}</option>
-                      ))}
-                    </optgroup>
-                  ))}
-                </Select>
-              </Field>
-              <Field label="Séries"><Input name="sets" type="number" min={1} defaultValue={3} /></Field>
-              <Field label="Repetições"><Input name="reps" defaultValue="12" /></Field>
-              <Field label="Carga"><Input name="load" placeholder="ex.: 20 kg" /></Field>
-              <Field label="Descanso (s)"><Input name="restSeconds" type="number" defaultValue={60} /></Field>
-              <Field label="Observação" className="col-span-2"><Input name="notes" placeholder="ex.: cadência 3-1-1" /></Field>
-              <div className="col-span-2"><SubmitButton className="w-full" icon="plus" pendingText="Adicionando…">Adicionar</SubmitButton></div>
-              <p className="col-span-2 text-xs text-zinc-500">★ = exercício criado por você. Crie novos em Exercícios.</p>
-            </form>
-          </Card>
-          <Card title="Copiar para outro aluno">
-            <form action={duplicateWorkout} className="grid gap-3 p-5">
-              <input type="hidden" name="id" value={id} />
-              <Select name="studentId" required>
-                {others.map((o) => <option key={o.id} value={o.id}>{o.name}</option>)}
-              </Select>
-              <SubmitButton variant="secondary" icon="copy" pendingText="Copiando…">Copiar treino</SubmitButton>
-            </form>
-          </Card>
-          <Card title="Excluir treino">
-            <form action={deleteWorkout} className="p-5">
-              <input type="hidden" name="id" value={id} />
-              <DangerConfirm label="Excluir treino" />
-            </form>
+
+        <div className="lg:col-span-2">
+          <Card title="Adicionar da biblioteca" className="lg:sticky lg:top-6">
+            <div className="space-y-3 p-4">
+              <form action={base}>
+                <div className="relative">
+                  <Icon name="search" size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400" />
+                  <Input name="q" defaultValue={q} placeholder="Buscar exercício" className="pl-9" />
+                </div>
+              </form>
+              <div className="flex flex-wrap gap-1.5">
+                {groups.map((g) => (
+                  <Link key={g} href={`${base}?grupo=${encodeURIComponent(g)}`} scroll={false} className={cx("rounded-full px-2.5 py-1 text-xs", !q && grupo === g ? "bg-zinc-900 text-white" : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200")}>
+                    {g}
+                  </Link>
+                ))}
+              </div>
+              <ul className="max-h-[560px] space-y-2 overflow-y-auto pr-1">
+                {picker.map((e) => (
+                  <li key={e.id} className="flex items-center gap-3 rounded-xl border border-zinc-100 p-2">
+                    <ExerciseImage images={e.images} name={e.name} size="sm" />
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-medium text-zinc-900">{e.name}</p>
+                      <p className="text-xs text-zinc-500">{e.equipment ?? e.muscleGroup}</p>
+                    </div>
+                    <form action={addWorkoutItem}>
+                      <input type="hidden" name="workoutId" value={id} />
+                      <input type="hidden" name="exerciseId" value={e.id} />
+                      <input type="hidden" name="sets" value={e.muscleGroup === "Cardio" ? "1" : "3"} />
+                      <input type="hidden" name="reps" value={e.muscleGroup === "Cardio" ? "20 min" : "12"} />
+                      <input type="hidden" name="restSeconds" value="60" />
+                      <SubmitButton variant="secondary" size="sm" icon="plus" pendingText="…">Adicionar</SubmitButton>
+                    </form>
+                  </li>
+                ))}
+                {picker.length === 0 && <li className="py-6 text-center text-sm text-zinc-500">Nenhum exercício encontrado.</li>}
+              </ul>
+              <Link href="/painel/exercicios" className="block text-center text-xs text-zinc-500 underline">Criar exercício próprio</Link>
+            </div>
           </Card>
         </div>
       </div>

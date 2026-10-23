@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import { and, asc, desc, eq, inArray, sql } from "drizzle-orm";
 import { schema as S } from "@/db";
 import { getStudentSession } from "@/lib/auth";
+import { requireAnamnese } from "@/lib/student";
 import { fmtDate } from "@/lib/format";
 import { Icon } from "@/components/icons";
 
@@ -12,6 +13,7 @@ export default async function Treinos({ params }: { params: Promise<{ tenant: st
   const { tenant: slug } = await params;
   const ctx = await getStudentSession(slug);
   if (!ctx) redirect(`/t/${slug}`);
+  await requireAnamnese(ctx, slug);
   const { db, student } = ctx;
   const workouts = await db.select().from(S.workouts).where(and(eq(S.workouts.studentId, student.id), eq(S.workouts.active, true))).orderBy(asc(S.workouts.name));
   const ids = workouts.map((w) => w.id);

@@ -102,3 +102,35 @@ export function studentAppUrl(slug: string) {
   const root = process.env.NEXT_PUBLIC_APP_URL ?? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "localhost:3000"}`;
   return `${root}/t/${slug}`;
 }
+
+/** Evolução de carga por exercício (maior carga de cada sessão). */
+export async function loadProgress(db: DB, studentId: string) {
+  const rows = await db
+    .select({ set: S.workoutSetLogs, ex: { id: S.exercises.id, name: S.exercises.name, images: S.exercises.images } })
+    .from(S.workoutSetLogs)
+    .innerJoin(S.exercises, eq(S.exercises.id, S.workoutSetLogs.exerciseId))
+    .where(eq(S.workoutSetLogs.studentId, studentId))
+    .orderBy(asc(S.workoutSetLogs.createdAt))
+    .limit(2000);
+  const byEx = new Map<string, { id: string; name: string; images: string[] | null; sessions: { logId: string; date: Date; maxKg: number; reps: number | null; volume: number }[] }>();
+  for (const { set, ex } of rows) {
+    let e = byEx.get(ex.id);
+    if (!e) byEx.set(ex.id, (e = { ...ex, sessions: [] }));
+    let s = e.sessions.find((x) => x.logId === set.workoutLogId);
+    if (!s) e.sessions.push((s = { logId: set.workoutLogId, date: set.createdAt, maxKg: 0, reps: null, volume: 0 }));
+    const kg = set.loadKg == null ? 0 : Number(set.loadKg);
+    if (kg >= s.maxKg) {
+      s.maxKg = kg;
+      s.reps = set.reps;
+    }
+    s.volume += kg * (set.reps ?? 0);
+  }
+  return [...byEx.values()]
+    .map((e) => ({
+      ...e,
+      last: e.sessions.at(-1)!,
+      best: Math.max(...e.sessions.map((s) => s.maxKg)),
+      first: e.sessions[0]!,
+    }))
+    .sort((a, b) => b.last.date.getTime() - a.last.date.getTime());
+}

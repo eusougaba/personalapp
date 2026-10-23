@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { and, asc, desc, eq, gte, lt } from "drizzle-orm";
 import { schema as S } from "@/db";
 import { getStudentSession } from "@/lib/auth";
+import { requireAnamnese } from "@/lib/student";
 import { Badge } from "@/components/ui";
 import { Icon } from "@/components/icons";
 import { fmtDayMonth, fmtWeekday, toLocalTime } from "@/lib/format";
@@ -12,6 +13,7 @@ export default async function AgendaAluno({ params }: { params: Promise<{ tenant
   const { tenant: slug } = await params;
   const ctx = await getStudentSession(slug);
   if (!ctx) redirect(`/t/${slug}`);
+  await requireAnamnese(ctx, slug);
   const { db, student } = ctx;
   const now = new Date();
   const base = db

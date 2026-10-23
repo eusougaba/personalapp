@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { desc, eq } from "drizzle-orm";
 import { schema as S } from "@/db";
 import { getStudentSession } from "@/lib/auth";
+import { requireAnamnese } from "@/lib/student";
 import { CopyButton } from "@/components/client";
 import { Badge, LinkButton, invoiceTone } from "@/components/ui";
 import { METHOD_LABEL, brl, fmtDate, whatsappLink } from "@/lib/format";
@@ -12,6 +13,7 @@ export default async function Pagamentos({ params }: { params: Promise<{ tenant:
   const { tenant: slug } = await params;
   const ctx = await getStudentSession(slug);
   if (!ctx) redirect(`/t/${slug}`);
+  await requireAnamnese(ctx, slug);
   const { db, tenant, student } = ctx;
   const invoices = await db.select().from(S.invoices).where(eq(S.invoices.studentId, student.id)).orderBy(desc(S.invoices.dueDate)).limit(24);
   const open = invoices.filter((i) => i.status === "PENDING" || i.status === "OVERDUE");

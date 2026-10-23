@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { and, asc, desc, eq, gte, inArray } from "drizzle-orm";
 import { getDb, schema as S } from "@/db";
 import { getStudentSession } from "@/lib/auth";
+import { requireAnamnese } from "@/lib/student";
 import { LoginForm } from "@/app/(auth)/forms";
 import { CopyButton } from "@/components/client";
 import { Icon } from "@/components/icons";
@@ -10,16 +11,16 @@ import { Badge, LinkButton, Notice, invoiceTone } from "@/components/ui";
 import { brl, fmtDate, fmtDayMonth, fmtWeekday, toLocalTime, whatsappLink } from "@/lib/format";
 import { DEMO_STUDENT } from "@/db/seed";
 
-export default async function AlunoHome({ params, searchParams }: { params: Promise<{ tenant: string }>; searchParams: Promise<{ concluido?: string }> }) {
+export default async function AlunoHome({ params, searchParams }: { params: Promise<{ tenant: string }>; searchParams: Promise<{ concluido?: string; bemvindo?: string }> }) {
   const { tenant: slug } = await params;
-  const { concluido } = await searchParams;
+  const { concluido, bemvindo } = await searchParams;
   const ctx = await getStudentSession(slug);
 
   if (!ctx) {
     const db = await getDb();
     const [tenant] = await db.select().from(S.tenants).where(eq(S.tenants.slug, slug));
     if (!tenant) notFound();
-    const demo = !process.env.DATABASE_URL && slug === "felipe";
+    const demo = !(process.env.POSTGRES_URL || process.env.DATABASE_URL) && slug === "felipe";
     return (
       <div className="space-y-5">
         <div className="rounded-3xl bg-white p-6 shadow-sm ring-1 ring-zinc-200">
@@ -40,6 +41,7 @@ export default async function AlunoHome({ params, searchParams }: { params: Prom
     );
   }
 
+  await requireAnamnese(ctx, slug);
   const { db, tenant, student } = ctx;
   const [workouts, next, open, lastLog] = await Promise.all([
     db.select().from(S.workouts).where(and(eq(S.workouts.studentId, student.id), eq(S.workouts.active, true))).orderBy(asc(S.workouts.name)),
@@ -72,6 +74,7 @@ export default async function AlunoHome({ params, searchParams }: { params: Prom
         <p className="text-sm text-zinc-500">Bem-vindo(a) de volta</p>
         <h1 className="text-2xl font-semibold tracking-tight">Olá, {first}!</h1>
       </div>
+      {bemvindo && <Notice tone="green">Respostas enviadas! Seu personal já pode montar seu treino com segurança.</Notice>}
       {concluido && <Notice tone="green">Treino registrado. Mandou bem! 💪</Notice>}
 
       {suggested ? (

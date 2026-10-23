@@ -14,3 +14,15 @@ input[type="date"],
 input[type="time"] {
   min-height: 42px;
 }
+
+/* Alterna posição inicial/final da imagem do exercício */
+@keyframes ex-frame {
+  0%, 45% { opacity: 0; }
+  55%, 100% { opacity: 1; }
+}
+.ex-frame-b {
+  animation: ex-frame 2.4s ease-in-out infinite alternate;
+}
+@media (prefers-reduced-motion: reduce) {
+  .ex-frame-b { animation: none; opacity: 0; }
+}

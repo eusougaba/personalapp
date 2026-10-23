@@ -12,7 +12,7 @@ const MAX_AGE = 60 * 60 * 24 * 30; // 30 dias
 
 function secret() {
   // Sem banco externo (modo local/demonstração) usa um segredo fixo; com Supabase, AUTH_SECRET é obrigatório.
-  const s = process.env.AUTH_SECRET || (!process.env.DATABASE_URL ? "dev-secret-somente-local" : "");
+  const s = process.env.AUTH_SECRET || (!(process.env.POSTGRES_URL || process.env.DATABASE_URL) ? "dev-secret-somente-local" : "");
   if (!s) throw new Error("Defina AUTH_SECRET nas variáveis de ambiente");
   return new TextEncoder().encode(s);
 }

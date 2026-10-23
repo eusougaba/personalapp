@@ -2,8 +2,11 @@ import { redirect } from "next/navigation";
 import { asc, eq } from "drizzle-orm";
 import { schema as S } from "@/db";
 import { getStudentSession } from "@/lib/auth";
+import { requireAnamnese } from "@/lib/student";
 import { Sparkline } from "@/components/charts";
 import { fmtDate } from "@/lib/format";
+import { loadProgress } from "@/lib/queries";
+import { ExerciseImage } from "@/components/exercise-image";
 
 export const metadata = { title: "Evolução" };
 
@@ -11,8 +14,12 @@ export default async function Evolucao({ params }: { params: Promise<{ tenant: s
   const { tenant: slug } = await params;
   const ctx = await getStudentSession(slug);
   if (!ctx) redirect(`/t/${slug}`);
+  await requireAnamnese(ctx, slug);
   const { db, tenant, student } = ctx;
-  const list = await db.select().from(S.assessments).where(eq(S.assessments.studentId, student.id)).orderBy(asc(S.assessments.date));
+  const [list, loads] = await Promise.all([
+    db.select().from(S.assessments).where(eq(S.assessments.studentId, student.id)).orderBy(asc(S.assessments.date)),
+    loadProgress(db, student.id),
+  ]);
   const first = list[0];
   const last = list.at(-1);
   const metric = (label: string, key: "weightKg" | "bodyFatPct", unit: string, color: string) => {
@@ -57,6 +64,30 @@ export default async function Evolucao({ params }: { params: Promise<{ tenant: s
             </div>
           )}
         </>
+      )}
+      <h2 className="pt-2 text-lg font-semibold">Minhas cargas</h2>
+      {loads.filter((l) => l.best > 0).length === 0 ? (
+        <p className="text-sm text-zinc-500">Registre as cargas ao fazer o treino para acompanhar sua evolução aqui.</p>
+      ) : (
+        <div className="space-y-2">
+          {loads.filter((l) => l.best > 0).map((l) => {
+            const diff = l.last.maxKg - l.first.maxKg;
+            return (
+              <div key={l.id} className="flex items-center gap-3 rounded-3xl bg-white p-3 ring-1 ring-zinc-200">
+                <ExerciseImage images={l.images} name={l.name} size="sm" />
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium">{l.name}</p>
+                  <p className="text-xs text-zinc-500">
+                    Última: {l.last.maxKg.toLocaleString("pt-BR")} kg{l.last.reps ? ` × ${l.last.reps}` : ""} · recorde {l.best.toLocaleString("pt-BR")} kg
+                  </p>
+                </div>
+                {l.sessions.length > 1 && (
+                  <span className={`text-sm font-semibold ${diff > 0 ? "text-emerald-600" : "text-zinc-400"}`}>{diff > 0 ? "+" : ""}{diff.toLocaleString("pt-BR")} kg</span>
+                )}
+              </div>
+            );
+          })}
+        </div>
       )}
     </div>
   );

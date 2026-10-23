@@ -5,7 +5,7 @@ import * as schema from "../src/db/schema";
 import { seedIfEmpty, DEMO_OWNER } from "../src/db/seed";
 
 async function main() {
-  const url = process.env.DATABASE_URL;
+  const url = process.env.POSTGRES_URL || process.env.DATABASE_URL;
   if (!url) throw new Error("Defina DATABASE_URL no .env.local");
   const client = postgres(url, { prepare: false, max: 1 });
   const created = await seedIfEmpty(drizzle(client, { schema }));

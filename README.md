@@ -13,13 +13,17 @@ Piloto: personal **Felipe Astur**.
 - Planos: recorrente (mensal/trimestral/semestral/anual), pacote de aulas, aula avulsa, consultoria online; valor, vencimento, desconto, multa
 - Financeiro: gerar mensalidades do mês (sem duplicar), cobrança avulsa, marcar recebido, cancelar, inadimplentes, entradas e despesas, saldo do caixa
 - Agenda: semana, aulas recorrentes, aulas em dupla/grupo, presença e falta (desconta saldo de pacote), cancelar aula ou série, confirmação por WhatsApp
-- Treinos: biblioteca com 43 exercícios + exercícios próprios, montagem de ficha, ordenação, copiar treino para outro aluno
+- Treinos: biblioteca com 63 exercícios com imagem de execução, filtros por músculo e equipamento, exercícios próprios, montagem de ficha com séries/reps/carga/descanso editáveis, copiar treino para outro aluno
+- Evolução de carga por exercício (primeira, última, recorde e tendência) a partir do que o aluno registra
+- Anamnese respondida pelo aluno no primeiro acesso, com alerta de saúde na ficha
 - Avaliações: peso, % gordura, medidas, gráficos de evolução
 - Minha marca: nome, cores, logo, WhatsApp, CREF, chave Pix, pré-visualização
 
 **App do aluno** (`/t/<personal>` ou `<personal>.dominio`)
 - Convite com criação de senha e consentimento LGPD
-- Treino do dia (sequência A → B → C), checklist de exercícios, registro de esforço
+- Questionário de anamnese obrigatório no primeiro acesso
+- Treino do dia (sequência A → B → C) em modo execução: carga e repetições por série, cronômetro de descanso com aviso, "última vez" de cada exercício, progresso salvo se a página recarregar
+- Minhas cargas: evolução por exercício
 - Agenda, pagamentos com chave Pix e "já paguei", evolução
 - PWA com nome, cor e ícone do personal
 
@@ -45,7 +49,7 @@ Para zerar os dados de demonstração, apague a pasta `apps/web/.data`.
 ## Usar o Supabase
 
 1. Copie `apps/web/.env.example` para `apps/web/.env.local`.
-2. Em Supabase → Project Settings → Database → Connection string, copie a URI do **Transaction pooler** (porta 6543) e cole em `DATABASE_URL`.
+2. Use a integração **Supabase ↔ Vercel** (cria `POSTGRES_URL` sozinha) ou, manualmente, copie a URI do **Transaction pooler** (porta 6543) em `DATABASE_URL`. Se as duas existirem, `POSTGRES_URL` tem prioridade.
 3. Gere um segredo para `AUTH_SECRET` (ex.: `openssl rand -base64 32`).
 4. `npm run db:migrate` (aplica migrações pendentes; as atuais já estão aplicadas) e, opcionalmente, `npm run db:seed` para criar o personal de demonstração.
 
@@ -74,3 +78,7 @@ docs/                  arquitetura, business plan e decisões (ADRs)
 - Uma branch por funcionalidade: `feat/cobranca-asaas`, `fix/agenda`.
 - Pull request com CI verde antes do merge; Conventional Commits (`feat:`, `fix:`, `docs:`).
 - Decisões de arquitetura em `docs/adr/`.
+
+## Créditos
+
+Imagens dos exercícios: [free-exercise-db](https://github.com/yuhonas/free-exercise-db) (domínio público). Organização por grupo muscular inspirada no MuscleWiki. Para regerar: `python3 apps/web/scripts/exercise-library.py <pasta do free-exercise-db>`.

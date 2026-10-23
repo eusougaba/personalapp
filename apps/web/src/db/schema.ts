@@ -194,6 +194,8 @@ export const exercises = pgTable("Exercise", {
   muscleGroup: text("muscleGroup"),
   videoUrl: text("videoUrl"),
   instructions: text("instructions"),
+  equipment: text("equipment"),
+  images: text("images").array(),
 });
 
 export const workouts = pgTable("Workout", {
@@ -224,6 +226,30 @@ export const workoutLogs = pgTable("WorkoutLog", {
   completedAt: ts("completedAt").notNull().defaultNow(),
   effort: integer("effort"),
   comment: text("comment"),
+  durationSec: integer("durationSec"),
+});
+
+export const workoutSetLogs = pgTable("WorkoutSetLog", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenantId").notNull(),
+  studentId: text("studentId").notNull(),
+  workoutLogId: text("workoutLogId").notNull(),
+  exerciseId: text("exerciseId").notNull(),
+  setNumber: integer("setNumber").notNull(),
+  reps: integer("reps"),
+  loadKg: numeric("loadKg", { precision: 6, scale: 2 }),
+  createdAt: ts("createdAt").notNull().defaultNow(),
+});
+
+export type AnamnesisAnswers = Record<string, string | string[] | boolean | null>;
+
+export const anamneses = pgTable("Anamnesis", {
+  id: text("id").primaryKey(),
+  tenantId: text("tenantId").notNull(),
+  studentId: text("studentId").notNull(),
+  answers: jsonb("answers").$type<AnamnesisAnswers>().notNull(),
+  hasRisk: boolean("hasRisk").notNull().default(false),
+  completedAt: ts("completedAt").notNull().defaultNow(),
 });
 
 export const assessments = pgTable("Assessment", {
@@ -253,3 +279,4 @@ export type Tenant = typeof tenants.$inferSelect;
 export type Student = typeof students.$inferSelect;
 export type Plan = typeof plans.$inferSelect;
 export type Invoice = typeof invoices.$inferSelect;
+export type Exercise = typeof exercises.$inferSelect;

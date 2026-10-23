@@ -6,7 +6,7 @@ export const metadata = { title: "Entrar" };
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ next?: string }> }) {
   const { next } = await searchParams;
-  const isDemo = !process.env.DATABASE_URL;
+  const isDemo = !(process.env.POSTGRES_URL || process.env.DATABASE_URL);
   return (
     <>
       <h1 className="text-2xl font-semibold tracking-tight">Entrar</h1>

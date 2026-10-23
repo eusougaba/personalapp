@@ -12,8 +12,25 @@ export type DB = PostgresJsDatabase<typeof schema>;
 
 const g = globalThis as unknown as { __db?: Promise<DB> };
 
+/**
+ * URL do banco. Preferência para POSTGRES_URL, criada automaticamente pela integração
+ * Supabase ↔ Vercel (senha sempre correta); DATABASE_URL é a configuração manual.
+ * Remove parâmetros extras (ex.: "supa=") que o Postgres não reconhece.
+ */
+export function databaseUrl(): string | null {
+  const raw = (process.env.POSTGRES_URL || process.env.DATABASE_URL || "").trim();
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    for (const k of [...u.searchParams.keys()]) if (k !== "sslmode") u.searchParams.delete(k);
+    return u.toString();
+  } catch {
+    return raw;
+  }
+}
+
 async function create(): Promise<DB> {
-  const url = process.env.DATABASE_URL;
+  const url = databaseUrl();
   if (url) {
     const postgres = (await import("postgres")).default;
     // prepare:false = compatível com o pooler do Supabase (porta 6543)
