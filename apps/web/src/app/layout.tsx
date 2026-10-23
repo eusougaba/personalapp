@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: { default: "Forja", template: "%s · Forja" },
+  title: { default: "Coachy", template: "%s · Coachy" },
   description: "Gestão de alunos, planos, agenda, treinos e cobranças para personal trainers.",
 };
 

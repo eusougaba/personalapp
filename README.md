@@ -1,4 +1,4 @@
-# Forja
+# Coachy
 
 Plataforma white label para personal trainers: alunos, planos, agenda, treinos, avaliações e cobranças, com um app para o aluno com a marca do personal.
 Web app responsivo (PWA); apps Android/iOS depois, reaproveitando o mesmo código.

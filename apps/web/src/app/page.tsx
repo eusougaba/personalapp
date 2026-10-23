@@ -15,11 +15,11 @@ export default async function Home() {
       <section className="mx-auto flex w-full max-w-6xl flex-1 flex-col justify-center px-6 pb-24">
         <span className="mb-6 self-start rounded-full border border-ink-3 px-3.5 py-1.5 text-sm text-zinc-400">Para personal trainer autônomo e estúdios</span>
         <h1 className="font-display text-[clamp(56px,10vw,128px)] uppercase leading-[0.92]">
-          Forje a sua
+          Seu app.
           <br />
-          <span className="text-volt">marca</span> de
+          <span className="text-volt">Sua</span> marca.
           <br />
-          personal.
+          Seus alunos.
         </h1>
         <p className="mt-6 max-w-xl text-lg text-zinc-400">Seus alunos treinam num app com o seu nome. Você cuida da agenda, dos treinos e das mensalidades num só lugar.</p>
         <div className="mt-8 flex flex-wrap gap-3">

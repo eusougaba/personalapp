@@ -99,6 +99,9 @@ export function inviteUrl(slug: string, token: string) {
 }
 
 export function studentAppUrl(slug: string) {
+  // Com DNS curinga ativo (*.coachy.com.br), cada personal ganha o próprio endereço.
+  const domain = process.env.NEXT_PUBLIC_ROOT_DOMAIN;
+  if (process.env.NEXT_PUBLIC_TENANT_SUBDOMAINS === "true" && domain) return `https://${slug}.${domain}`;
   const root = process.env.NEXT_PUBLIC_APP_URL ?? `http://${process.env.NEXT_PUBLIC_ROOT_DOMAIN ?? "localhost:3000"}`;
   return `${root}/t/${slug}`;
 }
