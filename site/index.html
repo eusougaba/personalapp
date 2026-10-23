@@ -3,193 +3,246 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>PersonalApp · O app do personal trainer com a sua marca</title>
-  <meta name="description" content="Alunos, planos, agenda, treinos, avaliações e cobranças num só lugar. Seus alunos usam um app com o seu nome e as suas cores. Teste grátis por 14 dias." />
-  <meta property="og:title" content="PersonalApp · O app do personal trainer com a sua marca" />
-  <meta property="og:description" content="Gestão completa para personal trainers: alunos, agenda, treinos e cobranças por Pix. Teste grátis." />
+  <title>Forja · O app de personal trainer com a sua marca</title>
+  <meta name="description" content="Seus alunos treinam num app com o seu nome. Agenda, treinos com registro de carga, anamnese e mensalidades por Pix num só lugar. Teste grátis por 14 dias." />
+  <meta property="og:title" content="Forja · Forje a sua marca de personal" />
+  <meta property="og:description" content="App white label para personal trainers: treinos, agenda e cobranças com a sua marca." />
   <meta property="og:type" content="website" />
-  <meta name="theme-color" content="#09090b" />
+  <meta name="theme-color" content="#0E0F0C" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href="fonts/anton.woff2" as="font" type="font/woff2" crossorigin />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <header class="nav">
     <div class="wrap nav-in">
-      <a href="#" class="logo"><span class="logo-mark">⟋</span>PersonalApp</a>
-      <nav class="nav-links">
+      <a href="#" class="logo" aria-label="Forja, início">FORJA<span>.</span></a>
+      <nav class="nav-links" aria-label="Seções">
         <a href="#recursos">Recursos</a>
         <a href="#aluno">App do aluno</a>
+        <a href="#marca">Sua marca</a>
         <a href="#precos">Preços</a>
-        <a href="#faq">Dúvidas</a>
       </nav>
       <div class="nav-cta">
         <a data-app="/entrar" class="link">Entrar</a>
-        <a data-app="/cadastro" class="btn btn-sm">Teste grátis</a>
+        <a data-app="/cadastro" class="btn btn-sm">Criar meu app</a>
       </div>
     </div>
   </header>
 
-  <section class="hero">
-    <div class="wrap hero-grid">
-      <div>
-        <span class="pill">Feito para personal trainer autônomo</span>
-        <h1>Seu app de personal, <em>com a sua marca.</em></h1>
-        <p class="lead">Pare de controlar alunos em planilha, agenda no papel e cobrança no WhatsApp. Organize tudo num só lugar e entregue aos seus alunos um app com o seu nome.</p>
-        <div class="hero-cta">
-          <a data-app="/cadastro" class="btn">Começar grátis por 14 dias</a>
-          <a href="#recursos" class="btn btn-ghost">Ver recursos</a>
+  <main>
+    <section class="hero">
+      <div class="wrap hero-grid">
+        <div class="hero-copy">
+          <span class="pill">Para personal trainer autônomo e estúdios</span>
+          <h1>Forje a sua<br /><em>marca</em> de<br />personal.</h1>
+          <p class="lead">Seus alunos treinam num app com o seu nome. Você cuida da agenda, dos treinos e das mensalidades num só lugar.</p>
+          <form class="signup" data-signup>
+            <label class="sr" for="email-hero">Seu e-mail</label>
+            <input id="email-hero" name="email" type="email" placeholder="seu@email.com" autocomplete="email" />
+            <button type="submit" class="btn">Testar 14 dias grátis</button>
+          </form>
+          <p class="fine">Sem cartão de crédito · cancele quando quiser</p>
         </div>
-        <p class="fine">Sem cartão de crédito · Cancele quando quiser</p>
-      </div>
-      <div class="phone-stack" aria-hidden="true">
-        <div class="phone">
-          <div class="ph-top" style="background:#0f172a"><span class="ph-logo">F</span>Felipe Astur Personal</div>
-          <div class="ph-body">
-            <p class="ph-hi">Olá, Ana!</p>
-            <div class="ph-card dark">
-              <small>Seu treino de hoje</small>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="photo">
+            <img src="img/ex_leg_press.jpg" alt="" />
+            <img src="img/ex_puxada_frente.jpg" alt="" />
+            <img src="img/ex_elevacao_pelvica.jpg" alt="" />
+            <img src="img/ex_agachamento_livre.jpg" alt="" />
+          </div>
+          <div class="phone">
+            <div class="ph-head" style="--b:#0F172A">
+              <div class="ph-brand"><span style="background:#F97316">F</span>Felipe Astur Personal</div>
               <strong>Treino A · Inferiores</strong>
-              <span class="ph-btn">Começar treino →</span>
+              <div class="ph-bar"><i style="width:40%"></i></div>
             </div>
-            <div class="ph-card">
-              <small>Próxima aula</small>
-              <strong>Quinta, 06:00</strong>
-              <span class="muted">Smart Fit Paulista</span>
-            </div>
-            <div class="ph-card">
-              <small>Mensalidade</small>
-              <strong>R$ 640,00</strong>
-              <span class="tag">Pagar com Pix</span>
+            <div class="ph-body">
+              <div class="ph-ex">
+                <img src="img/ex_leg_press.jpg" alt="" />
+                <div>
+                  <b>Leg press 45°</b>
+                  <small>Última vez: 4 × (117,5 kg × 12)</small>
+                </div>
+              </div>
+              <div class="ph-sets">
+                <span>1</span><span class="v">120</span><span class="v">12</span><span class="ok">✓</span>
+                <span>2</span><span class="v">120</span><span class="v">12</span><span class="ok on">✓</span>
+                <span>3</span><span class="v">120</span><span class="v">12</span><span class="ok">✓</span>
+              </div>
+              <div class="ph-rest"><span class="ring">0:45</span>Descanso · Leg press</div>
+              <div class="ph-pay"><div><small>Mensalidade</small><b>R$ 640,00</b></div><span>Pagar Pix</span></div>
             </div>
           </div>
+          <div class="float">
+            <small>Recebido em outubro</small>
+            <strong>R$ 4.170</strong>
+          </div>
         </div>
-        <div class="float-card">
-          <small>Recebido em outubro</small>
-          <strong>R$ 4.170,00</strong>
-          <span class="up">▲ 12% vs. setembro</span>
+      </div>
+    </section>
+
+    <section class="strip" aria-label="Destaques">
+      <div class="wrap strip-in">
+        <div><b>PIX</b><span>cobrança e lembrete no WhatsApp</span></div>
+        <div><b>63</b><span>exercícios com imagem de execução</span></div>
+        <div><b>1 LINK</b><span>o aluno instala, sem loja de apps</span></div>
+        <div><b>LGPD</b><span>anamnese com consentimento</span></div>
+      </div>
+    </section>
+
+    <section id="recursos" class="section">
+      <div class="wrap">
+        <h2 class="display">Tudo que o seu negócio precisa. <span class="mute">Nada que atrapalhe o treino.</span></h2>
+        <div class="cards">
+          <article class="card">
+            <span class="tag">01 · TREINO</span>
+            <h3>Monte a ficha em minutos. O aluno registra cada carga.</h3>
+            <p>Biblioteca com imagem de cada exercício, cronômetro de descanso e evolução de carga por exercício.</p>
+          </article>
+          <article class="card card-accent">
+            <span class="tag">02 · DINHEIRO</span>
+            <h3>Mensalidades no automático. Inadimplência na tela.</h3>
+            <p>Planos do seu jeito, cobrança por Pix e o caixa do mês sem planilha.</p>
+          </article>
+          <article class="card">
+            <span class="tag">03 · AGENDA</span>
+            <h3>Horários fixos, presença e reposição sem confusão.</h3>
+            <p>Pacotes descontam a aula sozinhos. Confirmação pelo WhatsApp em um toque.</p>
+          </article>
+          <article class="card">
+            <span class="tag">04 · SAÚDE</span>
+            <h3>Anamnese antes do primeiro treino.</h3>
+            <p>O aluno responde no primeiro acesso e você vê um alerta na ficha quando algo pede atenção.</p>
+          </article>
+          <article class="card">
+            <span class="tag">05 · EVOLUÇÃO</span>
+            <h3>Peso, medidas e cargas em gráficos.</h3>
+            <p>O aluno acompanha o próprio progresso e entende o valor do seu trabalho.</p>
+          </article>
+          <article class="card">
+            <span class="tag">06 · ALUNOS</span>
+            <h3>A ficha completa de cada aluno em um lugar.</h3>
+            <p>Plano, cobranças, presença, treinos e observações, com o WhatsApp a um clique.</p>
+          </article>
         </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="strip">
-    <div class="wrap strip-in">
-      <div><strong>Pix</strong><span>na cobrança</span></div>
-      <div><strong>WhatsApp</strong><span>integrado</span></div>
-      <div><strong>Sua marca</strong><span>no app do aluno</span></div>
-      <div><strong>LGPD</strong><span>desde o primeiro dia</span></div>
-    </div>
-  </section>
-
-  <section id="recursos" class="section">
-    <div class="wrap">
-      <h2>Tudo o que um personal precisa, sem complicação</h2>
-      <p class="sub">Os recursos dos grandes apps de academia, pensados para quem trabalha sozinho ou com uma pequena equipe.</p>
-      <div class="grid3">
-        <article class="feature"><span class="ic">👥</span><h3>Alunos organizados</h3><p>Ficha completa, objetivo, restrições, histórico, status e convite de acesso enviado pelo WhatsApp em um toque.</p></article>
-        <article class="feature"><span class="ic">🏷️</span><h3>Planos do seu jeito</h3><p>Mensal, trimestral, pacote de aulas, aula avulsa ou consultoria online. Você define valor, vencimento, desconto e multa.</p></article>
-        <article class="feature"><span class="ic">💸</span><h3>Cobrança e financeiro</h3><p>Mensalidades geradas automaticamente, inadimplentes em destaque, lembrete de cobrança pronto no WhatsApp, entradas, despesas e saldo do mês.</p></article>
-        <article class="feature"><span class="ic">📅</span><h3>Agenda inteligente</h3><p>Aulas recorrentes, em dupla ou grupo, controle de presença e desconto automático do saldo de pacotes.</p></article>
-        <article class="feature"><span class="ic">🏋️</span><h3>Treinos em minutos</h3><p>Biblioteca de exercícios, séries, repetições, carga e descanso. Copie um treino para outro aluno com um clique.</p></article>
-        <article class="feature"><span class="ic">📈</span><h3>Avaliação e evolução</h3><p>Peso, % de gordura e medidas com gráficos de evolução que o aluno também acompanha.</p></article>
+    <section id="aluno" class="section section-alt">
+      <div class="wrap split">
+        <div class="split-copy">
+          <span class="tag">APP DO ALUNO</span>
+          <h2 class="display">O treino na palma da mão. Com o seu nome.</h2>
+          <ul class="checks">
+            <li>Treino do dia com imagem de cada exercício</li>
+            <li>Carga e repetições anotadas em cada série</li>
+            <li>Cronômetro de descanso que avisa a próxima série</li>
+            <li>Agenda, mensalidades com Pix e evolução</li>
+            <li>Instala na tela inicial sem passar pela loja</li>
+          </ul>
+        </div>
+        <div class="steps">
+          <div class="step"><b>1</b><div><h3>Você cadastra o aluno</h3><p>Escolhe o plano e monta o treino na biblioteca.</p></div></div>
+          <div class="step"><b>2</b><div><h3>Ele recebe o convite no WhatsApp</h3><p>Cria a senha e responde a anamnese em 3 minutos.</p></div></div>
+          <div class="step"><b>3</b><div><h3>Treina e registra tudo</h3><p>Você acompanha cargas, presença e pagamentos no painel.</p></div></div>
+        </div>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="aluno" class="section alt">
-    <div class="wrap split">
-      <div>
-        <h2>Um app para o seu aluno, com o seu nome</h2>
-        <p class="sub left">Cada personal tem o próprio endereço, cores e logo. O aluno instala na tela do celular, sem passar pela loja de aplicativos.</p>
-        <ul class="checks">
-          <li>Treino do dia com checklist e registro de esforço</li>
-          <li>Agenda das próximas aulas</li>
-          <li>Mensalidades com chave Pix e envio de comprovante</li>
-          <li>Gráficos da própria evolução</li>
-          <li>Botão direto para falar com você no WhatsApp</li>
-        </ul>
+    <section id="marca" class="section">
+      <div class="wrap split split-rev">
+        <div class="brands" aria-hidden="true">
+          <div class="brand" style="--b:#0F172A;--a:#F97316"><div class="brand-top"><span class="brand-ini">F</span>Felipe Astur Personal</div><div class="brand-body"><span class="l1"></span><span class="l2"></span><span class="box"><span class="l3"></span><span class="l4"></span></span><span class="cta">Começar treino</span></div><small>felipe.forja.app</small></div>
+          <div class="brand" style="--b:#4C1D95;--a:#22C55E"><div class="brand-top"><span class="brand-ini">S</span>Studio Movimento</div><div class="brand-body"><span class="l1"></span><span class="l2"></span><span class="box"><span class="l3"></span><span class="l4"></span></span><span class="cta">Começar treino</span></div><small>movimento.forja.app</small></div>
+          <div class="brand" style="--b:#065F46;--a:#F59E0B"><div class="brand-top"><span class="brand-ini">J</span>Treino com a Ju</div><div class="brand-body"><span class="l1"></span><span class="l2"></span><span class="box"><span class="l3"></span><span class="l4"></span></span><span class="cta">Começar treino</span></div><small>ju.forja.app</small></div>
+        </div>
+        <div class="split-copy">
+          <span class="tag">WHITE LABEL DE VERDADE</span>
+          <h2 class="display">O app é da sua marca. A gente fica nos bastidores.</h2>
+          <p class="lead">Seu logo, suas cores e o seu endereço. O aluno vê você, não a gente.</p>
+        </div>
       </div>
-      <div class="brand-demo">
-        <div class="swatch" style="--c:#0f172a;--a:#f97316"><span>Felipe Astur Personal</span><b>felipe.personalapp.com.br</b></div>
-        <div class="swatch" style="--c:#4c1d95;--a:#22c55e"><span>Studio Movimento</span><b>movimento.personalapp.com.br</b></div>
-        <div class="swatch" style="--c:#065f46;--a:#fbbf24"><span>Treino com a Ju</span><b>ju.personalapp.com.br</b></div>
+    </section>
+
+    <section class="section">
+      <div class="wrap">
+        <figure class="quote">
+          <blockquote>“[DEPOIMENTO DO FELIPE ASTUR APÓS O PILOTO]”</blockquote>
+          <figcaption>Felipe Astur · personal trainer, São Paulo</figcaption>
+        </figure>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section class="section">
-    <div class="wrap">
-      <h2>Comece em 3 passos</h2>
-      <div class="steps">
-        <div><span>1</span><h3>Crie sua conta</h3><p>Escolha o endereço do seu app e coloque suas cores.</p></div>
-        <div><span>2</span><h3>Cadastre planos e alunos</h3><p>Envie o convite pelo WhatsApp: o aluno cria a senha e já entra.</p></div>
-        <div><span>3</span><h3>Gerencie tudo no celular</h3><p>Agenda, treinos e cobranças em um painel que funciona em qualquer tela.</p></div>
+    <section id="precos" class="section section-alt">
+      <div class="wrap">
+        <h2 class="display center">Preço simples. <span class="mute">14 dias grátis.</span></h2>
+        <div class="prices">
+          <article class="price">
+            <h3>Start</h3>
+            <p class="amount">R$ 49<small>/mês</small></p>
+            <p class="muted">Para quem está começando</p>
+            <ul><li>Até 20 alunos ativos</li><li>Treinos, agenda e financeiro</li><li>App do aluno</li></ul>
+            <a data-app="/cadastro" class="btn btn-ghost">Testar grátis</a>
+          </article>
+          <article class="price price-hot">
+            <span class="badge">Mais escolhido</span>
+            <h3>Pro</h3>
+            <p class="amount">R$ 99<small>/mês</small></p>
+            <p class="muted">Para o personal em crescimento</p>
+            <ul><li>Até 80 alunos ativos</li><li>Sua marca: logo, cores e endereço</li><li>Cobrança automática por Pix*</li></ul>
+            <a data-app="/cadastro" class="btn">Testar grátis</a>
+          </article>
+          <article class="price">
+            <h3>Studio</h3>
+            <p class="amount">R$ 199<small>/mês</small></p>
+            <p class="muted">Para estúdios e equipes</p>
+            <ul><li>Alunos ilimitados</li><li>Vários professores</li><li>Sem “feito com Forja”</li></ul>
+            <a data-app="/cadastro" class="btn btn-ghost">Testar grátis</a>
+          </article>
+        </div>
+        <p class="fine center">* Na cobrança automática há uma taxa por transação paga, informada antes da ativação.</p>
       </div>
-    </div>
-  </section>
+    </section>
 
-  <section id="precos" class="section alt">
-    <div class="wrap">
-      <h2>Preços simples</h2>
-      <p class="sub">14 dias grátis em qualquer plano. Sem fidelidade.</p>
-      <div class="grid3 pricing">
-        <article class="price">
-          <h3>Start</h3>
-          <p class="amount">R$ 49<small>/mês</small></p>
-          <p class="muted">Para quem está começando</p>
-          <ul><li>Até 20 alunos ativos</li><li>Planos, agenda e treinos</li><li>Financeiro e cobrança por WhatsApp</li><li>App do aluno</li></ul>
-          <a data-app="/cadastro" class="btn btn-ghost full">Testar grátis</a>
-        </article>
-        <article class="price featured">
-          <span class="badge">Mais escolhido</span>
-          <h3>Pro</h3>
-          <p class="amount">R$ 99<small>/mês</small></p>
-          <p class="muted">Para o personal em crescimento</p>
-          <ul><li>Até 80 alunos ativos</li><li>Tudo do Start</li><li>Sua marca: logo, cores e endereço próprio</li><li>Cobrança automática por Pix e cartão*</li></ul>
-          <a data-app="/cadastro" class="btn full">Testar grátis</a>
-        </article>
-        <article class="price">
-          <h3>Studio</h3>
-          <p class="amount">R$ 199<small>/mês</small></p>
-          <p class="muted">Para estúdios e equipes</p>
-          <ul><li>Alunos ilimitados</li><li>Tudo do Pro</li><li>Vários professores</li><li>Relatórios avançados</li></ul>
-          <a data-app="/cadastro" class="btn btn-ghost full">Testar grátis</a>
-        </article>
+    <section class="section">
+      <div class="wrap narrow">
+        <h2 class="display">Dúvidas</h2>
+        <details><summary>Meus alunos precisam baixar um aplicativo?</summary><p>Não. O app abre no navegador do celular e pode ser adicionado à tela inicial, com o seu nome e ícone. Versões nas lojas Android e iOS estão no nosso roteiro.</p></details>
+        <details><summary>Como recebo as mensalidades?</summary><p>Hoje você envia a cobrança com a sua chave Pix pelo WhatsApp e marca como recebido. A cobrança automática, com baixa sozinha, chega em breve.</p></details>
+        <details><summary>Preciso de cartão para testar?</summary><p>Não. São 14 dias grátis com tudo do plano Pro.</p></details>
+        <details><summary>E os dados de saúde dos alunos?</summary><p>O aluno autoriza o uso dos dados ao ativar o acesso, conforme a LGPD. Cada personal só vê os próprios alunos.</p></details>
+        <details><summary>Posso cancelar quando quiser?</summary><p>Sim, sem multa e sem fidelidade.</p></details>
       </div>
-      <p class="fine center">* Na cobrança automática há uma taxa por transação paga, informada antes da ativação.</p>
-    </div>
-  </section>
+    </section>
 
-  <section id="faq" class="section">
-    <div class="wrap narrow">
-      <h2>Dúvidas frequentes</h2>
-      <details><summary>Meus alunos precisam baixar um aplicativo?</summary><p>Não. O app do aluno abre no navegador do celular e pode ser adicionado à tela inicial, com o seu nome e ícone. Apps nas lojas Android e iOS estão no nosso roteiro.</p></details>
-      <details><summary>Como recebo as mensalidades?</summary><p>Hoje você envia a cobrança com sua chave Pix pelo WhatsApp e marca como recebido. A cobrança automática, com baixa sozinha e o dinheiro direto na sua conta, chega em breve.</p></details>
-      <details><summary>Preciso de cartão para testar?</summary><p>Não. São 14 dias grátis com todos os recursos do plano Pro.</p></details>
-      <details><summary>E os dados de saúde dos alunos?</summary><p>O aluno autoriza o uso dos dados ao ativar o acesso, conforme a LGPD. Cada personal só enxerga os próprios alunos.</p></details>
-      <details><summary>Posso cancelar quando quiser?</summary><p>Sim, sem multa e sem fidelidade.</p></details>
-    </div>
-  </section>
-
-  <section class="cta">
-    <div class="wrap center">
-      <h2>Seu negócio de personal merece um app à altura</h2>
-      <p>Comece hoje, de graça, e convide seus primeiros alunos ainda esta semana.</p>
-      <a data-app="/cadastro" class="btn btn-light">Criar minha conta grátis</a>
-    </div>
-  </section>
+    <section class="cta">
+      <div class="wrap center">
+        <h2 class="display big">Seu app pronto<br /><em>hoje.</em></h2>
+        <a data-app="/cadastro" class="btn btn-lg">Criar meu app grátis</a>
+      </div>
+    </section>
+  </main>
 
   <footer class="footer">
     <div class="wrap footer-in">
-      <span>© <span id="y"></span> PersonalApp</span>
-      <span><a data-app="/entrar">Entrar</a> · <a href="mailto:contato@personalapp.com.br">Contato</a></span>
+      <a href="#" class="logo">FORJA<span>.</span></a>
+      <span>contato@forja.app · São Paulo · © <span id="y"></span></span>
     </div>
   </footer>
 
   <script>
-    // Endereço do app (painel). Troque pela URL de produção quando publicar (ex.: https://app.seudominio.com.br).
-    var APP_URL = window.PERSONALAPP_URL || "https://personalapp-three-ashy.vercel.app";
+    // Endereço do app. Troque quando houver domínio próprio (ex.: https://app.forja.app).
+    var APP_URL = window.FORJA_APP_URL || "https://personalapp-three-ashy.vercel.app";
     document.querySelectorAll("[data-app]").forEach(function (a) { a.href = APP_URL + a.getAttribute("data-app"); });
+    document.querySelectorAll("[data-signup]").forEach(function (f) {
+      f.addEventListener("submit", function (e) {
+        e.preventDefault();
+        var email = (f.querySelector("input") || {}).value || "";
+        window.location.href = APP_URL + "/cadastro" + (email ? "?email=" + encodeURIComponent(email) : "");
+      });
+    });
     document.getElementById("y").textContent = new Date().getFullYear();
   </script>
 </body>

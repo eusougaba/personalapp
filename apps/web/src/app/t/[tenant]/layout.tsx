@@ -6,6 +6,7 @@ import { getStudentSession } from "@/lib/auth";
 import { BottomNav } from "@/components/client";
 import { logout } from "@/app/actions/auth";
 import { Icon } from "@/components/icons";
+import { PoweredBy } from "@/components/logo";
 
 export const dynamic = "force-dynamic";
 
@@ -63,7 +64,12 @@ export default async function TenantLayout({ children, params }: { children: Rea
           )}
         </div>
       </header>
-      <main className="mx-auto max-w-lg px-4 pb-28 pt-5">{children}</main>
+      <main className="mx-auto max-w-lg px-4 pb-28 pt-5">
+        {children}
+        <div className="mt-10 flex justify-center">
+          <PoweredBy />
+        </div>
+      </main>
       {session && (
         <BottomNav
           accent={tenant.accentColor}

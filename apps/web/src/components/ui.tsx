@@ -25,7 +25,7 @@ export function PageHeader({
             <Icon name="chevronLeft" size={16} /> Voltar
           </Link>
         )}
-        <h1 className="truncate text-2xl font-semibold tracking-tight text-zinc-900">{title}</h1>
+        <h1 className="font-display truncate text-3xl uppercase leading-tight tracking-[0.01em] text-ink sm:text-4xl">{title}</h1>
         {subtitle && <p className="mt-1 text-sm text-zinc-500">{subtitle}</p>}
       </div>
       {actions && <div className="flex flex-wrap gap-2">{actions}</div>}
@@ -50,7 +50,8 @@ export function Card({ children, className, title, action }: { children: ReactNo
 const btnBase =
   "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap";
 const btnVariants = {
-  primary: "bg-zinc-900 text-white hover:bg-zinc-700",
+  primary: "bg-ink text-white hover:bg-ink-3",
+  volt: "bg-volt text-ink hover:brightness-105",
   accent: "bg-[var(--accent)] text-white hover:brightness-110",
   secondary: "border border-zinc-200 bg-white text-zinc-800 hover:bg-zinc-50",
   ghost: "text-zinc-600 hover:bg-zinc-100",
@@ -142,7 +143,7 @@ export function Stat({ label, value, hint, tone, icon }: { label: string; value:
         {label}
         {icon && <Icon name={icon} size={18} className="text-zinc-400" />}
       </div>
-      <div className={cx("mt-2 text-2xl font-semibold tracking-tight", tone === "red" ? "text-red-600" : tone === "green" ? "text-emerald-600" : "text-zinc-900")}>
+      <div className={cx("font-display mt-2 text-[26px] sm:text-[32px] leading-none tracking-[0.01em]", tone === "red" ? "text-red-600" : tone === "green" ? "text-emerald-700" : "text-ink")}>
         {value}
       </div>
       {hint && <div className="mt-1 text-xs text-zinc-500">{hint}</div>}

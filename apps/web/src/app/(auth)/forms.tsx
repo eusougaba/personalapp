@@ -27,7 +27,7 @@ export function LoginForm({ next, demo }: { next?: string; demo?: { email: strin
   );
 }
 
-export function SignupForm({ rootDomain }: { rootDomain: string }) {
+export function SignupForm({ rootDomain, defaultEmail }: { rootDomain: string; defaultEmail?: string }) {
   const [state, action] = useActionState(signup, undefined);
   return (
     <form action={action} className="space-y-4">
@@ -42,12 +42,12 @@ export function SignupForm({ rootDomain }: { rootDomain: string }) {
         <Input name="slug" required pattern="[a-z0-9-]{3,32}" placeholder="felipeastur" />
       </Field>
       <Field label="E-mail">
-        <Input name="email" type="email" required autoComplete="email" />
+        <Input name="email" type="email" required autoComplete="email" defaultValue={defaultEmail} />
       </Field>
       <Field label="Senha" hint="Mínimo de 8 caracteres">
         <Input name="password" type="password" required minLength={8} autoComplete="new-password" />
       </Field>
-      <SubmitButton className="w-full" pendingText="Criando sua conta…">
+      <SubmitButton variant="volt" className="w-full" pendingText="Criando sua conta…">
         Criar conta grátis
       </SubmitButton>
       <p className="text-center text-xs text-zinc-500">14 dias grátis, sem cartão de crédito.</p>

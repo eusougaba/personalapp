@@ -37,7 +37,7 @@ export function SubmitButton({
 
 export type NavItem = { href: string; label: string; icon: IconName; exact?: boolean };
 
-export function SideNav({ items }: { items: NavItem[] }) {
+export function SideNav({ items, dark = false }: { items: NavItem[]; dark?: boolean }) {
   const path = usePathname();
   return (
     <nav className="flex flex-col gap-0.5">
@@ -49,7 +49,13 @@ export function SideNav({ items }: { items: NavItem[] }) {
             href={i.href}
             className={cx(
               "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition",
-              active ? "bg-zinc-900 text-white" : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
+              dark
+                ? active
+                  ? "bg-volt text-ink"
+                  : "text-zinc-400 hover:bg-ink-2 hover:text-white"
+                : active
+                  ? "bg-zinc-900 text-white"
+                  : "text-zinc-600 hover:bg-zinc-100 hover:text-zinc-900",
             )}
           >
             <Icon name={i.icon} size={18} />

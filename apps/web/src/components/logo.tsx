@@ -1,14 +1,23 @@
-export const PRODUCT_NAME = "PersonalApp";
+// Marca da plataforma (Forja). O aluno vê a marca do personal; esta aparece para o personal e no "feito com".
+export const PRODUCT_NAME = "Forja";
+export const PRODUCT_DOMAIN = "forja.app";
 
-export function Logo({ light = false }: { light?: boolean }) {
+export function Logo({ light = false, size = 26 }: { light?: boolean; size?: number }) {
   return (
-    <span className={`inline-flex items-center gap-2 text-lg font-semibold tracking-tight ${light ? "text-white" : "text-zinc-900"}`}>
-      <span className="grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-emerald-400 to-teal-600 text-white">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
-          <path d="M6.5 6.5 17.5 17.5M4 10l6-6M14 20l6-6" />
-        </svg>
-      </span>
-      {PRODUCT_NAME}
+    <span
+      className={`font-display inline-flex items-baseline uppercase leading-none tracking-[0.02em] ${light ? "text-[#F4F7E8]" : "text-[#0E0F0C]"}`}
+      style={{ fontSize: size }}
+      aria-label={PRODUCT_NAME}
+    >
+      FORJA<span className="text-volt-dark" style={{ color: light ? "var(--volt)" : undefined }}>.</span>
     </span>
+  );
+}
+
+export function PoweredBy({ className = "" }: { className?: string }) {
+  return (
+    <a href={`https://${PRODUCT_DOMAIN}`} target="_blank" rel="noopener noreferrer" className={`inline-flex items-center gap-1 text-[11px] text-zinc-400 hover:text-zinc-600 ${className}`}>
+      feito com <span className="font-display text-[12px] tracking-[0.04em] text-zinc-600">FORJA</span>
+    </a>
   );
 }
